@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface VehiculeRepository extends JpaRepository<Vehicule, Long> {
+public interface IVehiculeRepository extends JpaRepository<Vehicule, Long> {
 
     Optional<Vehicule> findByImmatriculation(String immatriculation);
 
@@ -30,16 +30,11 @@ public interface VehiculeRepository extends JpaRepository<Vehicule, Long> {
     List<Vehicule> findByStatutAndAgence_IdAgence(StatutVehicule statut, Long agenceId);
 
     /** Véhicules (hors maintenance) sans réservation active qui chevauche la période. */
-    @Query("""
-            select v from Vehicule v
-            where v.statut <> tn.esprit.autoloc.domain.StatutVehicule.MAINTENANCE
-              and not exists (
-                  select r.idReservation from Reservation r
-                  where r.vehicule = v
-                    and r.statut in :statuts
-                    and r.dateDebut <= :fin
-                    and r.dateFin >= :debut)
-            """)
+    @Query("select v from Vehicule v " +
+            "where v.statut <> tn.esprit.autoloc.domain.StatutVehicule.MAINTENANCE " +
+            "and not exists (select r.idReservation from Reservation r " +
+            "where r.vehicule = v and r.statut in :statuts " +
+            "and r.dateDebut <= :fin and r.dateFin >= :debut)")
     List<Vehicule> findDisponibles(@Param("debut") LocalDate debut,
                                    @Param("fin") LocalDate fin,
                                    @Param("statuts") Collection<StatutReservation> statuts);

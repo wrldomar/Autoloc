@@ -21,13 +21,10 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
     List<Reservation> findByStatut(StatutReservation statut);
 
     /** Vrai si le véhicule a déjà une réservation (parmi les statuts donnés) qui chevauche la période. */
-    @Query("""
-            select count(r) > 0 from Reservation r
-            where r.vehicule.idVehicule = :vehiculeId
-              and r.statut in :statuts
-              and r.dateDebut <= :fin
-              and r.dateFin >= :debut
-            """)
+    @Query("select count(r) > 0 from Reservation r " +
+            "where r.vehicule.idVehicule = :vehiculeId " +
+            "and r.statut in :statuts " +
+            "and r.dateDebut <= :fin and r.dateFin >= :debut")
     boolean existsChevauchement(@Param("vehiculeId") Long vehiculeId,
                                 @Param("debut") LocalDate debut,
                                 @Param("fin") LocalDate fin,
